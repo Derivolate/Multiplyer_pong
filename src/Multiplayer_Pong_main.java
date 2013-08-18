@@ -72,11 +72,6 @@ public class Multiplayer_Pong_main {
 				if(y < PADHEIGHT){//top
 		   			if(x+BALLSIZE > padx[0] && x < padx[0]+PADWIDTH){
 		   				dy = 1;
-		   				if(x<padx[0]+PADWIDTH/2 && x>padx[0]){//first half
-		   					dx -= .5;
-		   				}else if(x>padx[0]+PADWIDTH/2 && x<padx[0]+PADWIDTH){//second half
-		   					dx += .5;
-		   				}
 		   			}else{
 		   				endGame(0);		   			
 		   			}
