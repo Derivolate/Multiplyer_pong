@@ -45,6 +45,7 @@ public class Multiplayer_Pong_main {
 	double delta;
 	double xMult;
 	double yMult;
+	long lastBounce;
 	int angle;
 	long lastSpace;
 	int score[] = new int[4];
@@ -179,33 +180,46 @@ public class Multiplayer_Pong_main {
 		System.exit(0);
 	}
 	private void Bounce(int pad){
-		vMult+=0.001*delta;
-//		vMult+=(VMULTACTIVE?0.001*delta:0);
-		if(pad == 0){
-			if(y + BALLSIZE/2 < padx[0]+PADWIDTH/2){
-				System.out.println("left side");
-				if(dx == 1){
-					xMult-=.2;
-					yMult+=.2;
-					xMultCheck();
-				}else{
-					xMult+=.2;
-					yMult-=.2;
-					yMultCheck();
+		if (System.currentTimeMillis()-lastBounce > 200) {
+			vMult += 0.001 * delta;
+			//		vMult+=(VMULTACTIVE?0.001*delta:0);
+			if (pad == 0) {
+				if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
+					System.out.println("left side");
+					if (dx == 1) {
+						if (xMult > .2) {
+							xMult -= .2;
+							yMult += .2;
+							xMultCheck();
+						}
+
+					} else {
+						if (yMult > .2) {
+							xMult += .2;
+							yMult -= .2;
+							yMultCheck();
+						}
+					}
+				} else {
+					System.out.println("right side");
+					if (dx == 1) {
+						if (yMult > .2) {
+							xMult += .2;
+							yMult -= .2;
+							yMultCheck();
+						}
+					} else {
+
+						if (xMult > .2) {
+							xMult -= .2;
+							yMult += .2;
+							xMultCheck();
+						}
+					}
+
 				}
-			}else if(y + BALLSIZE/2 > padx[0]+PADWIDTH/2){
-				System.out.println("right side");
-				if(dx == 1){
-					xMult+=.2;
-					yMult-=.2;
-					yMultCheck();
-				}else{
-					xMult-=.2;
-					yMult+=.2;
-					xMultCheck();
-				}
-				
 			}
+			lastBounce = System.currentTimeMillis();
 		}
 	}
 	private void xMultCheck(){
