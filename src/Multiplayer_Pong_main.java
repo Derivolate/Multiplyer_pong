@@ -72,38 +72,38 @@ public class Multiplayer_Pong_main {
 				if(y < PADHEIGHT){//top
 		   			if(x+BALLSIZE > padx[0] && x < padx[0]+PADWIDTH){
 		   				dy = 1;
-		   			}else{
+		   			}else if(y < 0){
 		   				endGame(0);		   			
 		   			}
 				}else if(y +BALLSIZE > HEIGHT - PADHEIGHT){//bottom
-		   			if (PLAYERS >= 2) {
-						if (x + BALLSIZE > padx[1] && x < padx[1] + PADWIDTH) {
-							dy = -1;
-						} else {
-							endGame(1);
-						}
-					}else{
+					if (x + BALLSIZE > padx[1] && x < padx[1] + PADWIDTH && PLAYERS >= 2) {
 						dy = -1;
+					}else if(y +BALLSIZE > HEIGHT){
+				   		if (PLAYERS >= 2) {
+							endGame(1);
+				   		}else{
+				   			dy = -1;
+				   		}
 					}
 				}else if(x < PADHEIGHT){//left
-					if (PLAYERS >= 3) {
-						if (y + BALLSIZE > pady[2] && y < pady[2] + PADWIDTH) {
-							dx = 1;
-						} else {
-							endGame(2);
-						}
-					}else{
+					if (y + BALLSIZE > pady[2] && y < pady[2] + PADWIDTH && PLAYERS >= 3) {
 						dx = 1;
+					}else if(x < 0){
+						if (PLAYERS >= 3){
+							endGame(2);
+						}else{
+							dx = 1;
+						}	
 					}
 				}else if(x +BALLSIZE > WIDTH -PADHEIGHT){//right
-					if (PLAYERS == 4) {
-						if (y + BALLSIZE > pady[3] && y < pady[3] + PADWIDTH) {
-							dx = -1;
-						} else {
-							endGame(3);
-						}
-					}else{
+					if (y + BALLSIZE > pady[3] && y < pady[3] + PADWIDTH && PLAYERS >= 4) {
 						dx = -1;
+					}else if(x +BALLSIZE > WIDTH){
+						if (PLAYERS >= 4) {
+							endGame(3);
+						}else{
+							dx = -1;
+						}
 					}
 				}
 				vMult+=0.00001*delta;
