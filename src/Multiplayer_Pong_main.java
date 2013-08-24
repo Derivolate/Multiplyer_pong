@@ -12,13 +12,13 @@ abstract class GameState{
 public class Multiplayer_Pong_main {
 
 	public static final int WIDTH = 800, HEIGHT = 600;
-	public static int mouseX, mouseY;
-	public static final int FPS_LIMIT = 100;
+	public static final int FPS_LIMIT = 1000;
 	public static long lastFrame;
 	final int PADWIDTH = 100;
 	final int PADHEIGHT = 15;
 	final int BALLSIZE = 20;
 	final int PLAYERS = 1;
+	final boolean VMULTACTIVE = false;
 	public GameState game, mainMenu, pause, currentState;
 	private static long getTime(){
 		return(Sys.getTime()* 1000) / Sys.getTimerResolution();
@@ -43,6 +43,8 @@ public class Multiplayer_Pong_main {
 	double vMult;
 	double mMult;
 	double delta;
+	double xMult;
+	double yMult;
 	int angle;
 	long lastSpace;
 	int score[] = new int[4];
@@ -58,6 +60,7 @@ public class Multiplayer_Pong_main {
 			public void processInput() {
 				if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
 					currentState = game;
+					System.out.println("The game started");
 				}
 				movePads();
 			}
@@ -72,43 +75,49 @@ public class Multiplayer_Pong_main {
 				if(y < PADHEIGHT){//top
 		   			if(x+BALLSIZE > padx[0] && x < padx[0]+PADWIDTH){
 		   				dy = 1;
+		   				Bounce(0);
 		   			}else if(y < 0){
 		   				endGame(0);		   			
 		   			}
 				}else if(y +BALLSIZE > HEIGHT - PADHEIGHT){//bottom
 					if (x + BALLSIZE > padx[1] && x < padx[1] + PADWIDTH && PLAYERS >= 2) {
 						dy = -1;
+						Bounce(1);
 					}else if(y +BALLSIZE > HEIGHT){
 				   		if (PLAYERS >= 2) {
 							endGame(1);
 				   		}else{
 				   			dy = -1;
+				   			Bounce(4);
 				   		}
 					}
 				}else if(x < PADHEIGHT){//left
 					if (y + BALLSIZE > pady[2] && y < pady[2] + PADWIDTH && PLAYERS >= 3) {
 						dx = 1;
+						Bounce(2);
 					}else if(x < 0){
 						if (PLAYERS >= 3){
 							endGame(2);
 						}else{
 							dx = 1;
+							Bounce(4);
 						}	
 					}
 				}else if(x +BALLSIZE > WIDTH -PADHEIGHT){//right
 					if (y + BALLSIZE > pady[3] && y < pady[3] + PADWIDTH && PLAYERS >= 4) {
 						dx = -1;
+						Bounce(3);
 					}else if(x +BALLSIZE > WIDTH){
 						if (PLAYERS >= 4) {
 							endGame(3);
 						}else{
 							dx = -1;
+							Bounce(4);
 						}
 					}
 				}
-				vMult+=0.00001*delta;
-				x += dx*delta*vMult;
-				y += dy*delta*vMult;
+				x += dx*delta*xMult*vMult;
+				y += dy*delta*yMult*vMult;
 			}
 			@Override
 			public void processInput() {
@@ -168,6 +177,48 @@ public class Multiplayer_Pong_main {
 		}
 		Display.destroy();
 		System.exit(0);
+	}
+	private void Bounce(int pad){
+		vMult+=0.001*delta;
+//		vMult+=(VMULTACTIVE?0.001*delta:0);
+		if(pad == 0){
+			if(y + BALLSIZE/2 < padx[0]+PADWIDTH/2){
+				System.out.println("left side");
+				if(dx == 1){
+					xMult-=.2;
+					yMult+=.2;
+					xMultCheck();
+				}else{
+					xMult+=.2;
+					yMult-=.2;
+					yMultCheck();
+				}
+			}else if(y + BALLSIZE/2 > padx[0]+PADWIDTH/2){
+				System.out.println("right side");
+				if(dx == 1){
+					xMult+=.2;
+					yMult-=.2;
+					yMultCheck();
+				}else{
+					xMult-=.2;
+					yMult+=.2;
+					xMultCheck();
+				}
+				
+			}
+		}
+	}
+	private void xMultCheck(){
+		if(xMult<0){
+			xMult= (-xMult);
+			dx= (-dx);
+		}
+	}
+	private void yMultCheck(){
+		if(yMult<0){
+			yMult= (-yMult);
+			dy= (-dy);
+		}
 	}
 	private void endGame(int side){
 		System.out.println("The " + side + " pad let the ball through");
@@ -243,35 +294,41 @@ public class Multiplayer_Pong_main {
 		pady[2]=HEIGHT/2 - PADWIDTH/2;
 		padx[3]=WIDTH-PADHEIGHT;
 		pady[3]=HEIGHT/2 - PADWIDTH/2;
-		int corner = mainRandom.nextInt(4);
 		x = mainRandom.nextInt(WIDTH/2);
 		y = mainRandom.nextInt(HEIGHT/2);
+		spawnBall();
+		vMult = 0.2;
+		//begin speed
+		mMult = 0.5;
+		xMult = 1;
+		yMult = 1;
+		lastFrame = getTime();
+		currentState = mainMenu;
+		
+	}
+	public void spawnBall(){
+		int corner = mainRandom.nextInt(4);
 		if (corner == 0){//left top
 			dx = 1;
 			dy = 1;
-			System.out.println("Generated ball at corner "+ corner);
+			System.out.println("Generated ball at corner top left corner");
 		}else if(corner == 1){//right top
 			dx = -1;
 			dy = 1;
 			x+=WIDTH/2;
-			System.out.println("Generated ball at corner "+ corner);
+			System.out.println("Generated ball at corner top right corner");
 		}else if(corner == 2){//right bottom
 			dx = -1;
 			dy = -1;
 			x+=WIDTH/2;
 			y+=HEIGHT/2;
-			System.out.println("Generated ball at corner "+ corner);
+			System.out.println("Generated ball at corner bottom left corner");
 		}else if(corner == 3){//left bottom
 			dx = 1;
 			dy = -1;
 			y+=HEIGHT/2;
-			System.out.println("Generated ball at corner "+ corner);
+			System.out.println("Generated ball at corner bottom right corner");
 		}
-		vMult = 0.2;
-		mMult = 0.5;
-		lastFrame = getTime();
-		currentState = mainMenu;
-		
 	}
 	public static void main(String[] args){
 		new Multiplayer_Pong_main();
