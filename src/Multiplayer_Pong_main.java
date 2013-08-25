@@ -194,42 +194,45 @@ public class Multiplayer_Pong_main {
 		if (System.currentTimeMillis()-lastBounce > 100) {
 			vMult += 0.001 * delta;
 			lastBounce = System.currentTimeMillis();
-			//		vMult+=(VMULTACTIVE?0.001*delta:0);
-			if (pad == 0) {
-				if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
-					System.out.println("left side");
-					if (dx == 1) {
-						xMult -= .1;
-						yMult += .1;
+			if (pad != 4) {
+				//vMult+=(VMULTACTIVE?0.001*delta:0);
+				if (pad == 0) {
+					if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
+						System.out.println("left side");
+						if (dx == 1) {
+							xMult -= .1;
+							yMult += .1;
+						} else {
+							xMult += .1;
+							yMult -= .1;
+						}
 					} else {
-						xMult += .1;
-						yMult -= .1;
+						System.out.println("right side");
+						if (dx == 1) {
+							xMult += .1;
+							yMult -= .1;
+						} else {
+							xMult -= .1;
+							yMult += .1;
+						}
 					}
-				} else {
-					System.out.println("right side");
-					if (dx == 1) {
-						xMult += .1;
-						yMult -= .1;
-					} else {
-						xMult -= .1;
-						yMult += .1;
-					}
+					checkFlipX();
 				}
+
+
 			}
-//			if(xMult<0){
-//				xMult++;
-//				yMult--;
-//				xMult= (-xMult);
-//				
-//				dy= (-dy);
-//			}
-//			if(yMult<0){
-//				yMult++;
-//				xMult--;
-//				yMult= (-yMult);
-//				dx= (-dx);
-//			}
-			
+		}
+	}
+	private void checkFlipX(){
+		if(xMult < 0){
+			xMult = (-xMult);
+			dx = (-dx);
+		}
+	}
+	private void checkFlipY(){
+		if(yMult < 0){
+			yMult = (-yMult);
+			dy = (-dy);
 		}
 	}
 	private void endGame(int side){
