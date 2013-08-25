@@ -12,13 +12,21 @@ abstract class GameState{
 public class Multiplayer_Pong_main {
 
 	public static final int WIDTH = 800, HEIGHT = 600;
+	//never bring this below 10 due a bounce bug (see the Bounce() void)
 	public static final int FPS_LIMIT = 1000;
 	public static long lastFrame;
+	/*
+	 * Game rules are all final for debug reasons
+	 * They will be eventually be replaced with a cfg file
+	 */
 	final int PADWIDTH = 100;
 	final int PADHEIGHT = 15;
 	final int BALLSIZE = 20;
 	final int PLAYERS = 1;
 	final boolean VMULTACTIVE = false;
+	//Prevents the game from ending by hitting the top side 
+	//(only usefull for singleplayer testing)
+	final boolean DEBUGMODE = true;
 	public GameState game, mainMenu, pause, currentState;
 	private static long getTime(){
 		return(Sys.getTime()* 1000) / Sys.getTimerResolution();
@@ -77,7 +85,10 @@ public class Multiplayer_Pong_main {
 		   			if(x+BALLSIZE > padx[0] && x < padx[0]+PADWIDTH){
 		   				dy = 1;
 		   				Bounce(0);
-		   			}else if(y < 0){
+		   			}else if(y <= 0 && DEBUGMODE){
+		   				dy = 1;
+		   				Bounce(4);
+		   			}else if(y <= 0 &! DEBUGMODE){
 		   				endGame(0);		   			
 		   			}
 				}else if(y +BALLSIZE > HEIGHT - PADHEIGHT){//bottom
@@ -179,59 +190,46 @@ public class Multiplayer_Pong_main {
 		Display.destroy();
 		System.exit(0);
 	}
-	private void Bounce(int pad){
-		if (System.currentTimeMillis()-lastBounce > 200) {
+	private void Bounce(int pad){//pad 4 is the wall
+		if (System.currentTimeMillis()-lastBounce > 100) {
 			vMult += 0.001 * delta;
+			lastBounce = System.currentTimeMillis();
 			//		vMult+=(VMULTACTIVE?0.001*delta:0);
 			if (pad == 0) {
 				if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
 					System.out.println("left side");
 					if (dx == 1) {
-						if (xMult > .2) {
-							xMult -= .2;
-							yMult += .2;
-							xMultCheck();
-						}
-
+						xMult -= .1;
+						yMult += .1;
 					} else {
-						if (yMult > .2) {
-							xMult += .2;
-							yMult -= .2;
-							yMultCheck();
-						}
+						xMult += .1;
+						yMult -= .1;
 					}
 				} else {
 					System.out.println("right side");
 					if (dx == 1) {
-						if (yMult > .2) {
-							xMult += .2;
-							yMult -= .2;
-							yMultCheck();
-						}
+						xMult += .1;
+						yMult -= .1;
 					} else {
-
-						if (xMult > .2) {
-							xMult -= .2;
-							yMult += .2;
-							xMultCheck();
-						}
+						xMult -= .1;
+						yMult += .1;
 					}
-
 				}
 			}
-			lastBounce = System.currentTimeMillis();
-		}
-	}
-	private void xMultCheck(){
-		if(xMult<0){
-			xMult= (-xMult);
-			dx= (-dx);
-		}
-	}
-	private void yMultCheck(){
-		if(yMult<0){
-			yMult= (-yMult);
-			dy= (-dy);
+//			if(xMult<0){
+//				xMult++;
+//				yMult--;
+//				xMult= (-xMult);
+//				
+//				dy= (-dy);
+//			}
+//			if(yMult<0){
+//				yMult++;
+//				xMult--;
+//				yMult= (-yMult);
+//				dx= (-dx);
+//			}
+			
 		}
 	}
 	private void endGame(int side){
