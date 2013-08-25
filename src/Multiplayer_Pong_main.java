@@ -24,9 +24,10 @@ public class Multiplayer_Pong_main {
 	final int BALLSIZE = 20;
 	final int PLAYERS = 1;
 	final boolean VMULTACTIVE = false;
-	//Prevents the game from ending by hitting the top side 
-	//(only usefull for singleplayer testing)
+	//Prevents the game from ending by hitting a side 
 	final boolean DEBUGMODE = true;
+	//Allows control of all pad by just cursor keys
+	final boolean SINGLEPLAYER = false;
 	public GameState game, mainMenu, pause, currentState;
 	private static long getTime(){
 		return(Sys.getTime()* 1000) / Sys.getTimerResolution();
@@ -96,11 +97,11 @@ public class Multiplayer_Pong_main {
 						dy = -1;
 						Bounce(1);
 					}else if(y +BALLSIZE > HEIGHT){
-				   		if (PLAYERS >= 2) {
-							endGame(1);
-				   		}else{
+				   		if (DEBUGMODE) {
 				   			dy = -1;
 				   			Bounce(4);
+				   		}else if(PLAYERS >= 2 &! DEBUGMODE){
+				   			endGame(1);
 				   		}
 					}
 				}else if(x < PADHEIGHT){//left
@@ -108,24 +109,25 @@ public class Multiplayer_Pong_main {
 						dx = 1;
 						Bounce(2);
 					}else if(x < 0){
-						if (PLAYERS >= 3){
-							endGame(2);
-						}else{
-							dx = 1;
-							Bounce(4);
-						}	
+				   		if (DEBUGMODE) {
+				   			dx = 1;
+				   			Bounce(4);
+				   		}else if(PLAYERS >= 3 &! DEBUGMODE){
+				   			endGame(2);
+				   		}
 					}
 				}else if(x +BALLSIZE > WIDTH -PADHEIGHT){//right
 					if (y + BALLSIZE > pady[3] && y < pady[3] + PADWIDTH && PLAYERS >= 4) {
 						dx = -1;
 						Bounce(3);
 					}else if(x +BALLSIZE > WIDTH){
-						if (PLAYERS >= 4) {
-							endGame(3);
-						}else{
-							dx = -1;
-							Bounce(4);
-						}
+				   		if (DEBUGMODE) {
+				   			dx = -1;
+				   			Bounce(3);
+				   		}else if(PLAYERS == 4 &! DEBUGMODE){
+				   			endGame(4);
+				   		}
+						
 					}
 				}
 				x += dx*delta*xMult*vMult;
@@ -192,35 +194,63 @@ public class Multiplayer_Pong_main {
 	}
 	private void Bounce(int pad){//pad 4 is the wall
 		if (System.currentTimeMillis()-lastBounce > 100) {
+			
 			vMult += 0.001 * delta;
 			lastBounce = System.currentTimeMillis();
-			if (pad != 4) {
-				//vMult+=(VMULTACTIVE?0.001*delta:0);
-				if (pad == 0) {
-					if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
-						System.out.println("left side");
-						if (dx == 1) {
-							xMult -= .1;
-							yMult += .1;
-						} else {
-							xMult += .1;
-							yMult -= .1;
-						}
-					} else {
-						System.out.println("right side");
-						if (dx == 1) {
-							xMult += .1;
-							yMult -= .1;
-						} else {
-							xMult -= .1;
-							yMult += .1;
-						}
+			double xyMultMod = .2;
+			//vMult+=(VMULTACTIVE?0.001*delta:0);
+			if (pad == 0 || pad == 2) {
+				if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
+					System.out.println("left side");
+//				for debug reasons :)
+					if (dx == 1 && yMult<2) {
+						xMult -= xyMultMod;
+						yMult += xyMultMod;
+						checkFlipX();
+					} else if (dx == -1 && yMult > .1){
+						xMult += xyMultMod;
+						yMult -= xyMultMod;
 					}
-					checkFlipX();
+				} else {
+					System.out.println("right side");
+//				for debug reasons :)
+					if (dx == 1 && yMult > .1) {
+						xMult += xyMultMod;
+						yMult -= xyMultMod;
+					} else if (dx == -1 && yMult < 2){
+						xMult -= xyMultMod;
+						yMult += xyMultMod;
+						checkFlipX();
+					}
 				}
-
-
+			System.out.println("xMult: " + xMult + "\tyMult:" + yMult);
+//			} else if (pad == 1 || pad == 3){
+//				if (y + BALLSIZE / 2 < pady[pad] + PADWIDTH / 2) {
+////					System.out.println("top side");
+//////				for debug reasons :)
+//					if (dy == 1) {
+//						xMult += .1;
+//						yMult -= .1;
+//						checkFlipY();
+//					} else if (dy == -1 && xMult > .1){
+//						xMult -= .1;
+//						yMult += .1;
+//					}
+//				} else {
+////					System.out.println("bottom side");
+//////				for debug reasons :)
+//					if (dy == 1 && xMult > .1) {
+//						xMult -= .1;
+//						yMult += .1;
+//					} else {
+//						xMult += .1;
+//						yMult -= .1;
+//						checkFlipY();
+//					}
+//				}
+//			System.out.println("xMult: " + xMult + "\tyMult:" + yMult);				
 			}
+
 		}
 	}
 	private void checkFlipX(){
@@ -270,31 +300,31 @@ public class Multiplayer_Pong_main {
 			}
 		}
 		//pad1
-		if(Keyboard.isKeyDown(Keyboard.KEY_X)){
+		if(Keyboard.isKeyDown(Keyboard.KEY_X)|| Keyboard.isKeyDown(Keyboard.KEY_RIGHT) && SINGLEPLAYER){
 			if(padx[1]+PADWIDTH<WIDTH){
 				padx[1] += delta*mMult;
 			}
-		}else if(Keyboard.isKeyDown(Keyboard.KEY_Z)){
+		}else if(Keyboard.isKeyDown(Keyboard.KEY_Z)|| Keyboard.isKeyDown(Keyboard.KEY_LEFT) && SINGLEPLAYER){
 			if(padx[1]>0){
 				padx[1] -= delta*mMult;
 			}
 		}
 		//pad2
-		if(Keyboard.isKeyDown(Keyboard.KEY_A )){
+		if(Keyboard.isKeyDown(Keyboard.KEY_A )|| Keyboard.isKeyDown(Keyboard.KEY_DOWN) && SINGLEPLAYER){
 			if(pady[2]+PADWIDTH<HEIGHT){
 				pady[2] += delta*mMult;
 			}
-		}else if(Keyboard.isKeyDown(Keyboard.KEY_Q)){
+		}else if(Keyboard.isKeyDown(Keyboard.KEY_Q)|| Keyboard.isKeyDown(Keyboard.KEY_UP) && SINGLEPLAYER){
 			if(pady[2]>0){
 				pady[2] -= delta*mMult;
 			}
 		}
 		//pad3
-		if(Keyboard.isKeyDown(Keyboard.KEY_J)){
+		if(Keyboard.isKeyDown(Keyboard.KEY_J)|| Keyboard.isKeyDown(Keyboard.KEY_DOWN) && SINGLEPLAYER){
 			if(pady[3]+PADWIDTH<HEIGHT){
 				pady[3] += delta*mMult;
 			}
-		}else if(Keyboard.isKeyDown(Keyboard.KEY_I)){
+		}else if(Keyboard.isKeyDown(Keyboard.KEY_I)|| Keyboard.isKeyDown(Keyboard.KEY_UP) && SINGLEPLAYER){
 			if(pady[3]>0){
 				pady[3] -= delta*mMult;
 			}
