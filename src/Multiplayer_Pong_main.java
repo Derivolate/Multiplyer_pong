@@ -223,6 +223,7 @@ public class Multiplayer_Pong_main {
 						checkFlipX();
 					}
 				}
+				//TODO : fix rounding of xMult and yMult
 			System.out.println("xMult: " + xMult + "\tyMult:" + yMult);
 //			} else if (pad == 1 || pad == 3){
 //				if (y + BALLSIZE / 2 < pady[pad] + PADWIDTH / 2) {
