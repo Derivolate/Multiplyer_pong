@@ -38,11 +38,6 @@ public class Multiplayer_Pong_main {
 		lastFrame = getTime();
 		return delta;
 	}
-	boolean getNegative(double i){
-
-		return(i<0?true:false);
-	}
-	boolean Negative = true;
 	double padx[] = new double[4];
 	double pady[] = new double[4];
 	double x;
@@ -56,7 +51,6 @@ public class Multiplayer_Pong_main {
 	double yMult;
 	long lastBounce;
 	int angle;
-	long lastSpace;
 	int score[] = new int[4];
 	Random mainRandom = new Random();
 	public Multiplayer_Pong_main(){
@@ -197,73 +191,8 @@ public class Multiplayer_Pong_main {
 			
 			vMult += 0.001 * delta;
 			lastBounce = System.currentTimeMillis();
-			double xyMultMod = .2;
 			//vMult+=(VMULTACTIVE?0.001*delta:0);
-			if (pad == 0 || pad == 2) {
-				if (x + BALLSIZE / 2 < padx[pad] + PADWIDTH / 2) {
-					System.out.println("left side");
-//				for debug reasons :)
-					if (dx == 1 && yMult<2) {
-						xMult -= xyMultMod;
-						yMult += xyMultMod;
-						checkFlipX();
-					} else if (dx == -1 && yMult > .1){
-						xMult += xyMultMod;
-						yMult -= xyMultMod;
-					}
-				} else {
-					System.out.println("right side");
-//				for debug reasons :)
-					if (dx == 1 && yMult > .1) {
-						xMult += xyMultMod;
-						yMult -= xyMultMod;
-					} else if (dx == -1 && yMult < 2){
-						xMult -= xyMultMod;
-						yMult += xyMultMod;
-						checkFlipX();
-					}
-				}
-				//TODO : fix rounding of xMult and yMult
-			System.out.println("xMult: " + xMult + "\tyMult:" + yMult);
-//			} else if (pad == 1 || pad == 3){
-//				if (y + BALLSIZE / 2 < pady[pad] + PADWIDTH / 2) {
-////					System.out.println("top side");
-//////				for debug reasons :)
-//					if (dy == 1) {
-//						xMult += .1;
-//						yMult -= .1;
-//						checkFlipY();
-//					} else if (dy == -1 && xMult > .1){
-//						xMult -= .1;
-//						yMult += .1;
-//					}
-//				} else {
-////					System.out.println("bottom side");
-//////				for debug reasons :)
-//					if (dy == 1 && xMult > .1) {
-//						xMult -= .1;
-//						yMult += .1;
-//					} else {
-//						xMult += .1;
-//						yMult -= .1;
-//						checkFlipY();
-//					}
-//				}
-//			System.out.println("xMult: " + xMult + "\tyMult:" + yMult);				
-			}
 
-		}
-	}
-	private void checkFlipX(){
-		if(xMult < 0){
-			xMult = (-xMult);
-			dx = (-dx);
-		}
-	}
-	private void checkFlipY(){
-		if(yMult < 0){
-			yMult = (-yMult);
-			dy = (-dy);
 		}
 	}
 	private void endGame(int side){
