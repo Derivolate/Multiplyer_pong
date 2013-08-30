@@ -50,7 +50,8 @@ public class Multiplayer_Pong_main {
 	double xMult;
 	double yMult;
 	long lastBounce;
-	int angle;
+	int angledeg;
+	double anglerad;
 	int score[] = new int[4];
 	Random mainRandom = new Random();
 	public Multiplayer_Pong_main(){
@@ -189,9 +190,27 @@ public class Multiplayer_Pong_main {
 	private void Bounce(int pad){//pad 4 is the wall
 		if (System.currentTimeMillis()-lastBounce > 100) {
 			
-			vMult += 0.001 * delta;
+			vMult+=(VMULTACTIVE?0.001*delta:0);
+
+			if(pad != 4){
+				anglerad = (angledeg * Math.PI / 180);
+				xMult = (Math.cos(anglerad));
+				yMult = (Math.sin(anglerad));
+//				if (pad == 0 || pad == 2){
+//					int padb = (int) (x - padx[pad]);
+//					if(dx== -1){
+//						padb = 100-padb;
+//					}
+//					padb -= 50;
+//				}
+//				System.out.println(tempxMult + "\t" + tempyMult);
+//				System.out.println(dy*delta*tempyMult*vMult);
+//				System.out.println(dx*delta*tempxMult*vMult);
+			}
+
+			
+
 			lastBounce = System.currentTimeMillis();
-			//vMult+=(VMULTACTIVE?0.001*delta:0);
 
 		}
 	}
@@ -272,13 +291,18 @@ public class Multiplayer_Pong_main {
 		x = mainRandom.nextInt(WIDTH/2);
 		y = mainRandom.nextInt(HEIGHT/2);
 		spawnBall();
-		vMult = 0.2;
+		vMult = 0.5;
 		//begin speed
-		mMult = 0.5;
+		mMult = 1;
 		xMult = 1;
 		yMult = 1;
 		lastFrame = getTime();
 		currentState = mainMenu;
+		angledeg = 70;
+		anglerad = (angledeg * Math.PI / 180);
+		xMult = (Math.cos(anglerad));
+		yMult = (Math.sin(anglerad));
+
 		
 	}
 	public void spawnBall(){
